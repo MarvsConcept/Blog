@@ -1,16 +1,19 @@
 from typing import Any
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.views.generic.base import TemplateView
 from django.views.generic import ListView
 from django.views.generic import DetailView
+from django.views import View
 
 from .models import Post
-
+from .forms import CommentForm
 
 
 # Create your views here.
 
-class index(TemplateView):
+class index(ListView):
     template_name = "blog/index.html"
     model = Post
     ordering = ["-date"]
@@ -40,19 +43,28 @@ class AllPostsView(ListView):
 #         "all_posts":all_posts
 #         })
 
-class post_detail(DetailView):
-    template_name = "blog/post-detail.html"
-    model = Post
+class post_detail(View):
+    def get(self, request, slug):
+        post = Post.objects.get(slug=slug)
+        context = {
+            "post": post,
+            "post_tags": post.tags.all(),
+            "comment_form": CommentForm()
+        }
+        return render(request, "blog.post-detail.html", )
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["post_tags"] = self.object.tags.all()
-        return context 
+    
+    def post(self, request):
+        comment_form = CommentForm[reques.POST]
+        if comment_form.is_valid():
+            comment_form.save()
+        return HttpResponseRedirect
+
     
 
 # def post_detail(request, slug):
 #     identified_post = get_object_or_404(Post, slug=slug)
 #     return render(request, "blog/post-detail.html", {
 #         "post": identified_post,
-#         "post_tags": identified_post.tags.all()
-#     })
+#         "post_tags": identified_post.tags.all() })
+
