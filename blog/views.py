@@ -86,12 +86,6 @@ class post_detail(View):
         }
         return render(request, "blog/post-detail.html", context )
 
-# def post_detail(request, slug):
-#     identified_post = get_object_or_404(Post, slug=slug)
-#     return render(request, "blog/post-detail.html", {
-#         "post": identified_post,
-#         "post_tags": identified_post.tags.all() })
-
 class ReadLaterView(View):
     def get(self, request):
         stored_posts = request.session.get("stored_posts")
@@ -122,5 +116,5 @@ class ReadLaterView(View):
             stored_posts.remove(post_id)
             
         request.session["stored_posts"] = stored_posts
-            
+        
         return HttpResponseRedirect("/")
